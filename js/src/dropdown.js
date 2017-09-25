@@ -76,12 +76,14 @@ const Dropdown = (() => {
 
   const Default = {
     offset      : 0,
-    flip        : true
+    flip        : true,
+    display     : 'dynamic'
   }
 
   const DefaultType = {
     offset      : '(number|string)',
-    flip        : 'boolean'
+    flip        : 'boolean',
+    display     : 'string'
   }
 
 
@@ -258,10 +260,10 @@ const Dropdown = (() => {
         }
       }
 
-      // Disable Popper.js for Dropdown in Navbar
-      if (this._inNavbar) {
+      // Disable Popper.js for Dropdown in Navbar or if we have a static display
+      if (this._inNavbar || this._config.display === 'static') {
         popperConfig.modifiers.applyStyle = {
-          enabled: !this._inNavbar
+          enabled: false
         }
       }
       return popperConfig
