@@ -76,12 +76,14 @@ const Dropdown = (() => {
 
   const Default = {
     offset      : 0,
-    flip        : true
+    flip        : true,
+    container   : false
   }
 
   const DefaultType = {
     offset      : '(number|string|function)',
-    flip        : 'boolean'
+    flip        : 'boolean',
+    container   : '(boolean|string|element)'
   }
 
 
@@ -152,6 +154,9 @@ const Dropdown = (() => {
           element = parent
         }
       }
+      if (Util.isElement(this._config.container)) {
+        $(this._config.container).append(this._menu)
+      }
       this._popper = new Popper(element, this._menu, this._getPopperConfig())
 
       // if this is a touch-enabled device we add extra
@@ -213,6 +218,16 @@ const Dropdown = (() => {
         config,
         this.constructor.DefaultType
       )
+
+      if (Util.isElement(config.container) || typeof config.container === 'string') {
+        // if it's a jQuery object or a collection of elements
+        if (typeof config.container.jquery === 'string' && typeof config.container[0] !== 'undefined') {
+          config.container = config.container[0]
+        } else if (typeof config.container === 'string') {
+          const tmpContainer = $(document).find(config.container)
+          config.container   = typeof tmpContainer[0] !== 'undefined' ? tmpContainer[0] : false
+        }
+      }
 
       return config
     }
@@ -337,6 +352,9 @@ const Dropdown = (() => {
         }
 
         toggles[i].setAttribute('aria-expanded', 'false')
+        if (Util.isElement(context._config.container)) {
+          $(parent).append(context._menu)
+        }
 
         $(dropdownMenu).removeClass(ClassName.SHOW)
         $(parent)
