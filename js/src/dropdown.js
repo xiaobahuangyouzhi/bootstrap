@@ -98,9 +98,9 @@ const Dropdown = (() => {
     constructor(element, config) {
       this._element  = element
       this._popper   = null
+      this._inNavbar = this._detectNavbar()
       this._config   = this._getConfig(config)
       this._menu     = this._getMenuElement()
-      this._inNavbar = this._detectNavbar()
 
       this._addEventListeners()
     }
@@ -154,7 +154,7 @@ const Dropdown = (() => {
           element = parent
         }
       }
-      if (Util.isElement(this._config.container)) {
+      if (Util.isElement(this._config.container) && !this._inNavbar) {
         $(this._config.container).append(this._menu)
       }
       this._popper = new Popper(element, this._menu, this._getPopperConfig())
@@ -219,13 +219,16 @@ const Dropdown = (() => {
         this.constructor.DefaultType
       )
 
-      if (Util.isElement(config.container) || typeof config.container === 'string') {
-        // if it's a jQuery object or a collection of elements
-        if (typeof config.container.jquery === 'string' && typeof config.container[0] !== 'undefined') {
-          config.container = config.container[0]
-        } else if (typeof config.container === 'string') {
-          const tmpContainer = $(document).find(config.container)
-          config.container   = typeof tmpContainer[0] !== 'undefined' ? tmpContainer[0] : false
+      // Only for dropdowns not in a navbar because we need Popper.js
+      if (!this._inNavbar) {
+        if (Util.isElement(config.container) || typeof config.container === 'string') {
+          // if it's a jQuery object or a collection of elements
+          if (typeof config.container.jquery === 'string' && typeof config.container[0] !== 'undefined') {
+            config.container = config.container[0]
+          } else if (typeof config.container === 'string') {
+            const tmpContainer = $(document).find(config.container)
+            config.container   = typeof tmpContainer[0] !== 'undefined' ? tmpContainer[0] : false
+          }
         }
       }
 
@@ -352,7 +355,7 @@ const Dropdown = (() => {
         }
 
         toggles[i].setAttribute('aria-expanded', 'false')
-        if (Util.isElement(context._config.container)) {
+        if (Util.isElement(context._config.container) && !context._inNavbar) {
           $(parent).append(context._menu)
         }
 
